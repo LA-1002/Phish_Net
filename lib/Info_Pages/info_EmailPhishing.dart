@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 class Info_EmailPhishing extends StatefulWidget {
   const Info_EmailPhishing({Key? key}) : super(key: key);
@@ -8,6 +9,8 @@ class Info_EmailPhishing extends StatefulWidget {
 }
 
 class _Info_EmailPhishingState extends State<Info_EmailPhishing> {
+  late VideoPlayerController _controller;
+  late Future<void> _initaliseVideo;
   List<String> heading = [
     'What is it?',
     'Types',
@@ -39,7 +42,7 @@ class _Info_EmailPhishingState extends State<Info_EmailPhishing> {
     'A further indication is that the email is asking you to click onto a link, this is a common tactic used to direct the user to a seemingly legitimate website where the user then puts in info thinking that it is the actual site, for example Facebook when it is actually the attacker, this can also be used to download a malicious file to the device.[3]',
     'Looking for spelling mistakes in an email is a further way of rooting out potential phishing emails, often these emails are not proof-read or checked to make sure that these errors are found, it is also a theory that these mistakes are left in to ensure only the most gullible or unaware of users fall for the email, thus making the success of the operation more likely[3]',
     'This is also seen frequently in Phishing scams where the attacker tries to get the victim to download a malicious file onto their device which can contain malware to infect the device/network or even be software to give the attacker remote access into the network.[3][4]',
-    'Lastly, Urgency is also seen in such phishing emails to make it seem important that the user moves quickly to follow the request of the attacker, this is to ensure that the email is looked at less for potential flaws which could give away the scam.[3][4]',
+    'Urgency is also seen in such phishing emails to make it seem important that the user moves quickly to follow the request of the attacker, this is to ensure that the email is looked at less for potential flaws which could give away the scam.[3][4]',
   ];
   List<String> sources = [
     '1)	https://www.tessian.com/blog/phishing-statistics-2020/',
@@ -72,7 +75,21 @@ class _Info_EmailPhishingState extends State<Info_EmailPhishing> {
       ),
     );
   }
-
+  @override
+  void initState() {
+    // TODO: implement 
+    //_controller = VideoPlayerController.network('https://raw.githubusercontent.com/LA-1002/phish_net/main/phishing_example_video_1.mp4');
+    _controller = VideoPlayerController.asset('assets/section_videos/phishing_example_video.mp4');
+    _initaliseVideo = _controller.initialize();
+    //_controller.setLooping(true);
+    super.initState();
+  }
+  @override
+  void dispose() {
+    _controller.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -155,7 +172,52 @@ class _Info_EmailPhishingState extends State<Info_EmailPhishing> {
                         images[5],
                         sourceTemp('https://blog.usecure.io/hubfs/Example%20of%20a%20nigerian%20scam.jpg'),
                         // Example Video Of Attack
-                        hTemplate(heading[4])
+                        hTemplate(heading[4]),
+                        Container(
+                          height: 200,
+                          child: Stack(
+                            children: [
+                              FutureBuilder(
+                                future: _initaliseVideo,
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState == ConnectionState.done) {
+                                    return AspectRatio(aspectRatio: _controller.value.aspectRatio,
+                                    child: VideoPlayer(_controller),
+                                    );
+                                  } else {
+                                    return const Center(
+                                      child: CircularProgressIndicator(),
+                                    );
+                                  }
+                                },
+                              ),
+                              //VIDEO
+                              Container(
+                                margin: EdgeInsets.only(left: 10,top: 130),
+                                child: FloatingActionButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      if (_controller.value.isPlaying){
+                                        _controller.pause();
+                                      } else {
+                                        _controller.play();
+                                      }
+                                    });
+                                  },
+                                  child: Icon(_controller.value.isPlaying ? Icons.pause : Icons.play_arrow,),
+                                ),
+                              )
+                              //BUTTON
+                            ],
+                          ),
+                        ),
+                        hTemplate(heading[5]),
+                        sourceTemp('1)	https://www.tessian.com/blog/phishing-statistics-2020/'),
+                        sourceTemp('2)	https://www.imperva.com/learn/application-security/phishing-attack-scam/'),
+                        sourceTemp('3)	https://www.itgovernance.co.uk/blog/5-ways-to-detect-a-phishing-email'),
+                        sourceTemp('4)	https://cofense.com/knowledge-center/signs-of-a-phishing-email/'),
+
+
 
                         //END OF LIST
                       ],
